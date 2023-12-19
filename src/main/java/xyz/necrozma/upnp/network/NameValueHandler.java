@@ -16,7 +16,7 @@ public class NameValueHandler extends DefaultHandler {
     /**
      * A reference to the name-value map to populate with the data being read
      */
-    private Map<String,String> nameValue;
+    private final Map<String,String> nameValue;
 
     /**
      * The last read element
@@ -36,7 +36,7 @@ public class NameValueHandler extends DefaultHandler {
 
     /**
      * Receive notification of the start of an element.
-     *
+     * <p>
      * Caches the element as {@link #currentElement}, so that it will be stored
      * as a map key when the corresponding value will be read.
      *
@@ -63,13 +63,13 @@ public class NameValueHandler extends DefaultHandler {
 
     /**
      * Receive notification of the end of an element.
-     *
+     * <p>
      * It is used to reset currentElement when the XML node is closed.
      * Note: this works only when the data we are interested in does not contain
      * child nodes.
-     *
+     * <p>
      * Based on a patch provided by christophercyll and attached to issue #4:
-     * http://code.google.com/p/weupnp/issues/detail?id=4
+     * <a href="http://code.google.com/p/weupnp/issues/detail?id=4">...</a>
      *
      * @param uri The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -90,7 +90,7 @@ public class NameValueHandler extends DefaultHandler {
 
     /**
      * Receive notification of character data inside an element.
-     *
+     * <p>
      * Stores the characters as value, using {@link #currentElement} as a key
      *
      * @param ch The characters.
@@ -112,7 +112,5 @@ public class NameValueHandler extends DefaultHandler {
             }
         }
     }
-
-
 
 }

@@ -29,7 +29,7 @@ public class PortMappingEntry {
      */
     private String enabled;
     /**
-     * A human readable description of the port mapping (used for display
+     * A human-readable description of the port mapping (used for display
      * purposes)
      */
     private String portMappingDescription;

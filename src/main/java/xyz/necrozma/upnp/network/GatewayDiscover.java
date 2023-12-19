@@ -22,10 +22,11 @@ import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
 /**
- * Handles the discovery of GatewayDevices, via the {@link org.bitlet.weupnp.GatewayDiscover#discover()} method.
+ * Handles the discovery of GatewayDevices, via the {@link xyz.necrozma.upnp.network.GatewayDiscover()} method.
  */
 public class GatewayDiscover {
 
@@ -52,7 +53,7 @@ public class GatewayDiscover {
     /**
      * The gateway types the discover have to search.
      */
-    private String[] searchTypes;
+    private final String[] searchTypes;
 
     /**
      * The default gateway types to use in search
@@ -139,8 +140,8 @@ public class GatewayDiscover {
 
     /**
      * Constructor.
-     *
-     * By default it's looking for 3 types of gateways.
+     * <p>
+     * By default, it's looking for 3 types of gateways.
      *
      */
     public GatewayDiscover() {
@@ -204,20 +205,7 @@ public class GatewayDiscover {
 
         for (int i = 0; i < searchTypes.length; i++) {
 
-            String searchMessage = "M-SEARCH * HTTP/1.1\r\n" +
-                    "HOST: " + IP + ":" + PORT + "\r\n" +
-                    "ST: " + searchTypes[i] + "\r\n" +
-                    "MAN: \"ssdp:discover\"\r\n" +
-                    "MX: 2\r\n" +    // seconds to delay response
-                    "\r\n";
-
-            // perform search requests for multiple network adapters concurrently
-            Collection<SendDiscoveryThread> threads = new ArrayList<SendDiscoveryThread>();
-            for (InetAddress ip : ips) {
-                SendDiscoveryThread thread = new SendDiscoveryThread(ip, searchMessage);
-                threads.add(thread);
-                thread.start();
-            }
+            Collection<SendDiscoveryThread> threads = getSendDiscoveryThreads(i, ips);
 
             // wait for all search threads to finish
             for (SendDiscoveryThread thread : threads)
@@ -234,6 +222,25 @@ public class GatewayDiscover {
         } // loop SEARCHTYPES
 
         return devices;
+    }
+
+    @NotNull
+    private Collection<SendDiscoveryThread> getSendDiscoveryThreads(int i, Collection<InetAddress> ips) {
+        String searchMessage = "M-SEARCH * HTTP/1.1\r\n" +
+                "HOST: " + IP + ":" + PORT + "\r\n" +
+                "ST: " + searchTypes[i] + "\r\n" +
+                "MAN: \"ssdp:discover\"\r\n" +
+                "MX: 2\r\n" +    // seconds to delay response
+                "\r\n";
+
+        // perform search requests for multiple network adapters concurrently
+        Collection<SendDiscoveryThread> threads = new ArrayList<SendDiscoveryThread>();
+        for (InetAddress ip : ips) {
+            SendDiscoveryThread thread = new SendDiscoveryThread(ip, searchMessage);
+            threads.add(thread);
+            thread.start();
+        }
+        return threads;
     }
 
     /**
@@ -291,6 +298,7 @@ public class GatewayDiscover {
                     return device;
                 }
             } catch (Exception e) {
+                System.err.println("Error while checking if gateway is connected: " + e.getMessage());
             }
         }
 
@@ -324,9 +332,6 @@ public class GatewayDiscover {
             return arrayIPAddress;
         }
 
-        if (networkInterfaces == null)
-            return arrayIPAddress;
-
         // For every suitable network interface, get all IP addresses
         while (networkInterfaces.hasMoreElements()) {
             NetworkInterface card = networkInterfaces.nextElement();
@@ -342,20 +347,17 @@ public class GatewayDiscover {
 
             Enumeration<InetAddress> addresses = card.getInetAddresses();
 
-            if (addresses == null)
-                continue;
-
             while (addresses.hasMoreElements()) {
                 InetAddress inetAddress = addresses.nextElement();
                 int index = arrayIPAddress.size();
 
                 if (!getIPv4 || !getIPv6) {
-                    if (getIPv4 && !Inet4Address.class.isInstance(inetAddress))
+                    if (getIPv4 && !(inetAddress instanceof Inet4Address))
                         continue;
 
-                    if (getIPv6 && !Inet6Address.class.isInstance(inetAddress))
+                    if (getIPv6 && !(inetAddress instanceof Inet6Address))
                         continue;
-                } else if (sortIPv4BeforeIPv6 && Inet4Address.class.isInstance(inetAddress)) {
+                } else if (sortIPv4BeforeIPv6 && inetAddress instanceof Inet4Address) {
                     index = lastIPv4Index++;
                 }
 

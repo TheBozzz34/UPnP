@@ -48,7 +48,7 @@ public final class Main extends JavaPlugin {
         if (portsString != null) {
             portsArray = portsString.split(",");
         } else {
-            portsArray = new String[0]; // or handle null case as needed
+            portsArray = new String[0];
         }
 
         Set<Integer> uniqueValidPorts = new HashSet<>();
@@ -71,7 +71,7 @@ public final class Main extends JavaPlugin {
 
         uniqueValidPortsArray = uniqueValidPorts.toArray(new Integer[0]);
 
-        logger.info("Starting weupnp with the following ports:");
+        logger.info("Starting UPnP with the following ports:");
 
         logger.info(Arrays.toString(uniqueValidPortsArray));
 

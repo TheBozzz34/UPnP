@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -47,7 +48,7 @@ public class GatewayDevice {
     // description data
 
     /**
-     * The friendly (human readable) name associated with this device
+     * The friendly (human-readable) name associated with this device
      */
     private String friendlyName;
 
@@ -101,7 +102,7 @@ public class GatewayDevice {
      *
      * @throws SAXException if an error occurs while parsing the request
      * @throws IOException  on communication errors
-     * @see org.bitlet.weupnp.GatewayDeviceHandler
+     * @see xyz.necrozma.upnp.network.GatewayDeviceHandler
      */
     public void loadDescription() throws SAXException, IOException {
 
@@ -115,7 +116,7 @@ public class GatewayDevice {
 
         /* fix urls */
         String ipConDescURL;
-        if (urlBase != null && urlBase.trim().length() > 0) {
+        if (urlBase != null && !urlBase.trim().isEmpty()) {
             ipConDescURL = urlBase;
         } else {
             ipConDescURL = location;
@@ -153,28 +154,7 @@ public class GatewayDevice {
                                                         String service, String action, Map<String, String> args)
             throws IOException, SAXException {
         String soapAction = "\"" + service + "#" + action + "\"";
-        StringBuilder soapBody = new StringBuilder();
-
-        soapBody.append("<?xml version=\"1.0\"?>\r\n" +
-                "<SOAP-ENV:Envelope " +
-                "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-                "SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                "<SOAP-ENV:Body>" +
-                "<m:" + action + " xmlns:m=\"" + service + "\">");
-
-        if (args != null && args.size() > 0) {
-
-            Set<Map.Entry<String, String>> entrySet = args.entrySet();
-
-            for (Map.Entry<String, String> entry : entrySet) {
-                soapBody.append("<" + entry.getKey() + ">" + entry.getValue() +
-                        "</" + entry.getKey() + ">");
-            }
-
-        }
-
-        soapBody.append("</m:" + action + ">");
-        soapBody.append("</SOAP-ENV:Body></SOAP-ENV:Envelope>");
+        StringBuilder soapBody = getStringBuilder(service, action, args);
 
         URL postUrl = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) postUrl.openConnection();
@@ -206,13 +186,32 @@ public class GatewayDevice {
                 // FIXME We probably need to find a better way to return
                 // significant information when we reach this point
             }
-            conn.disconnect();
-            return nameValue;
         } else {
             parser.parse(new InputSource(conn.getInputStream()));
-            conn.disconnect();
-            return nameValue;
         }
+        conn.disconnect();
+        return nameValue;
+    }
+
+    @NotNull
+    private static StringBuilder getStringBuilder(String service, String action, Map<String, String> args) {
+        StringBuilder soapBody = new StringBuilder();
+
+        soapBody.append("<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope " + "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " + "SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" + "<SOAP-ENV:Body>" + "<m:").append(action).append(" xmlns:m=\"").append(service).append("\">");
+
+        if (args != null && !args.isEmpty()) {
+
+            Set<Map.Entry<String, String>> entrySet = args.entrySet();
+
+            for (Map.Entry<String, String> entry : entrySet) {
+                soapBody.append("<").append(entry.getKey()).append(">").append(entry.getValue()).append("</").append(entry.getKey()).append(">");
+            }
+
+        }
+
+        soapBody.append("</m:").append(action).append(">");
+        soapBody.append("</SOAP-ENV:Body></SOAP-ENV:Envelope>");
+        return soapBody;
     }
 
     /**
@@ -229,12 +228,8 @@ public class GatewayDevice {
                 serviceType, "GetStatusInfo", null);
 
         String connectionStatus = nameValue.get("NewConnectionStatus");
-        if (connectionStatus != null
-                && connectionStatus.equalsIgnoreCase("Connected")) {
-            return true;
-        }
-
-        return false;
+        return connectionStatus != null
+                && connectionStatus.equalsIgnoreCase("Connected");
     }
 
     /**
@@ -351,7 +346,7 @@ public class GatewayDevice {
     }
 
     /**
-     * Returns a specific port mapping entry, depending on a the supplied index.
+     * Returns a specific port mapping entry, depending on a supplied index.
      *
      * @param index            the index of the desired port mapping
      * @param portMappingEntry the entry containing the details, in any is
