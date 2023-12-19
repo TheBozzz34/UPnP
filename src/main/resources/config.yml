@@ -1,0 +1,19 @@
+#####################
+# UPnp By Necrozma #
+####################
+config-version: 1 # DO NOT TOUCH
+
+##########
+#Settings:
+##########
+
+# Whether to enable bStats
+bstats: true
+
+# List of additional ports to open separated by commas, e.g. 25565,25566,25567
+# These are optional as the plugin will automatically detect the port used by the server
+ports:
+
+# Whether to close the ports when the server stops
+close-ports-on-stop: true
+
