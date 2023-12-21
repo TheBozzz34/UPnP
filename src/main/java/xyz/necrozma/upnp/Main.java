@@ -140,7 +140,6 @@ public final class Main extends JavaPlugin {
                                 }
                             }
                             logger.info("TCP Port Mapping successful");
-                            logger.info("Checking if server is online");
                         }
                     }
                 }
@@ -151,69 +150,7 @@ public final class Main extends JavaPlugin {
         } catch (IOException | SAXException | ParserConfigurationException e) {
             logger.error("Error while trying to open ports for UPnP", e);
         }
-
-        String serverOnline = isServerOnline();
-        logger.info("Server status: " + serverOnline);
     }
-
-    private static String isServerOnline() {
-        try {
-
-            String AppUrl = "https://proxy.necrozma.xyz/proxy";
-
-            String ipAddress = gatewayDevice.getExternalIPAddress();
-            String port = String.valueOf(Main.getPlugin(Main.class).getServer().getPort());
-
-            String data = "{\"ip\": \"" + ipAddress + "\", \"port\": \"" + port + "\"}";
-
-            HttpURLConnection connection = getHttpURLConnection(AppUrl);
-            DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-            outputStream.writeBytes(data);
-            outputStream.flush();
-            outputStream.close();
-
-            int responseCode = connection.getResponseCode();
-
-            // Read response
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                logger.info(response.toString());
-                return response.toString();
-            } else {
-                return("Request failed");
-            }
-        } catch (Exception e) {
-            logger.error("Error while trying to check if server is online", e);
-        }
-        return null;
-    }
-
-    @NotNull
-    private static HttpURLConnection getHttpURLConnection(String AppUrl) throws IOException {
-        URL url = new URL(AppUrl);
-
-        // Create connection object
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        // Set request method
-        connection.setRequestMethod("POST");
-
-        // Set request headers
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Accept", "application/json");
-
-        // Enable output and set data
-        connection.setDoOutput(true);
-        return connection;
-    }
-
     @Override
     public void onDisable() {
         logger.info("UPnP service stopping...");
