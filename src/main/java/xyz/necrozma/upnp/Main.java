@@ -1,9 +1,29 @@
+/*
+    This simple plugin allows a Minecraft server to automatically open network ports on supported routers using UPnP.
+    Copyright (C) 2023  Necrozma
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
 package xyz.necrozma.upnp;
 
 import dev.dejvokep.boostedyaml.route.Route;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.jetbrains.annotations.NotNull;
 import xyz.necrozma.upnp.network.GatewayDevice;
 import xyz.necrozma.upnp.network.GatewayDiscover;
 import xyz.necrozma.upnp.network.PortMappingEntry;
@@ -13,18 +33,29 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.net.HttpURLConnection;
+import java.io.InputStreamReader;
 
 import org.bstats.bukkit.Metrics;
 
 public final class Main extends JavaPlugin {
-    private final Logger logger = LoggerFactory.getLogger(Main.class);
-    private GatewayDevice gatewayDevice;
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    public static GatewayDevice gatewayDevice;
     private Integer[] uniqueValidPortsArray = null;
-    private boolean removePorts = false;
+    private boolean shouldRemovePortsOnStop = false;
+
+    public static boolean isPortValid(int port) {
+        return port >= 0 && port <= 65535;
+    }
+
 
     @Override
     public void onEnable() {
@@ -39,7 +70,7 @@ public final class Main extends JavaPlugin {
             logger.info("Disabling bstats because of config");
         }
 
-        removePorts = configManager.getBoolean(Route.from("close-ports-on-stop"));
+        shouldRemovePortsOnStop = configManager.getBoolean(Route.from("close-ports-on-stop"));
 
         int serverPort = getServer().getPort();
 
@@ -59,7 +90,7 @@ public final class Main extends JavaPlugin {
             try {
                 int portNumber = Integer.parseInt(port.trim());
                 // Check if the port number is within the valid range
-                if (Utils.isPortValid(portNumber)) {
+                if (isPortValid(portNumber)) {
                     uniqueValidPorts.add(portNumber);
                 } else {
                     logger.error("Port number out of range: {}", portNumber);
@@ -92,7 +123,7 @@ public final class Main extends JavaPlugin {
                     PortMappingEntry portMapping = new PortMappingEntry();
 
                     logger.info("Querying device to see if mapping for port " + port + " already exists");
-                    if (!gatewayDevice.getSpecificPortMappingEntry(port, "TCP", portMapping)) {
+                    if (gatewayDevice.getSpecificPortMappingEntry(port, "TCP", portMapping)) {
                         logger.info("Port was already mapped. Aborting.");
                     } else {
                         logger.info("Sending port mapping request");
@@ -105,10 +136,11 @@ public final class Main extends JavaPlugin {
                                     logger.info("Port mapping attempt failed");
                                 } else {
                                     logger.info("UDP Port Mapping successful");
+
                                 }
                             }
                             logger.info("TCP Port Mapping successful");
-
+                            logger.info("Checking if server is online");
                         }
                     }
                 }
@@ -119,11 +151,73 @@ public final class Main extends JavaPlugin {
         } catch (IOException | SAXException | ParserConfigurationException e) {
             logger.error("Error while trying to open ports for UPnP", e);
         }
+
+        String serverOnline = isServerOnline();
+        logger.info("Server status: " + serverOnline);
     }
+
+    private static String isServerOnline() {
+        try {
+
+            String AppUrl = "https://proxy.necrozma.xyz/proxy";
+
+            String ipAddress = gatewayDevice.getExternalIPAddress();
+            String port = String.valueOf(Main.getPlugin(Main.class).getServer().getPort());
+
+            String data = "{\"ip\": \"" + ipAddress + "\", \"port\": \"" + port + "\"}";
+
+            HttpURLConnection connection = getHttpURLConnection(AppUrl);
+            DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+            outputStream.writeBytes(data);
+            outputStream.flush();
+            outputStream.close();
+
+            int responseCode = connection.getResponseCode();
+
+            // Read response
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                logger.info(response.toString());
+                return response.toString();
+            } else {
+                return("Request failed");
+            }
+        } catch (Exception e) {
+            logger.error("Error while trying to check if server is online", e);
+        }
+        return null;
+    }
+
+    @NotNull
+    private static HttpURLConnection getHttpURLConnection(String AppUrl) throws IOException {
+        URL url = new URL(AppUrl);
+
+        // Create connection object
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Set request method
+        connection.setRequestMethod("POST");
+
+        // Set request headers
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+
+        // Enable output and set data
+        connection.setDoOutput(true);
+        return connection;
+    }
+
     @Override
     public void onDisable() {
         logger.info("UPnP service stopping...");
-        if(removePorts) {
+        if(shouldRemovePortsOnStop) {
             if (gatewayDevice != null) {
                 for (int port : uniqueValidPortsArray) {
                     try {

@@ -174,7 +174,7 @@ public class GatewayDevice {
 
         conn.getOutputStream().write(soapBodyBytes);
 
-        Map<String, String> nameValue = new HashMap<String, String>();
+        Map<String, String> nameValue = new HashMap<>();
         XMLReader parser = XMLReaderFactory.createXMLReader();
         parser.setContentHandler(new NameValueHandler(nameValue));
         if (conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
