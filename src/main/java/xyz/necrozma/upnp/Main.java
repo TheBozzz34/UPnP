@@ -135,6 +135,7 @@ public final class Main extends JavaPlugin {
                             logger.info("UDP port mapping successful for port " + port);
                         }
                     }
+
                 }
             } else {
                 logger.info("No valid gateway device found.");
