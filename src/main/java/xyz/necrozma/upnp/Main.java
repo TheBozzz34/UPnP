@@ -23,7 +23,7 @@ import dev.dejvokep.boostedyaml.route.Route;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.jetbrains.annotations.NotNull;
+
 import xyz.necrozma.upnp.network.GatewayDevice;
 import xyz.necrozma.upnp.network.GatewayDiscover;
 import xyz.necrozma.upnp.network.PortMappingEntry;
@@ -33,15 +33,12 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.URL;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.net.HttpURLConnection;
-import java.io.InputStreamReader;
+
 
 import org.bstats.bukkit.Metrics;
 
@@ -65,7 +62,7 @@ public final class Main extends JavaPlugin {
         if (configManager.getBoolean(Route.from("bstats"))) {
             int pluginId = 20515;
             Metrics metrics = new Metrics(this, pluginId);
-            logger.info("Enabled Bstats");
+            logger.info("Enabled Metrics");
         } else {
             logger.info("Disabling bstats because of config");
         }
@@ -130,16 +127,12 @@ public final class Main extends JavaPlugin {
                         if (!gatewayDevice.addPortMapping(port, port, gatewayDevice.getLocalAddress().getHostAddress(), "TCP", "Port forwarded by UPnP plugin")) {
                             logger.info("Port mapping attempt failed");
                         } else {
-
-                            if(port == getServer().getPort()) {
-                                if (!gatewayDevice.addPortMapping(port, port, gatewayDevice.getLocalAddress().getHostAddress(), "UDP", "Port forwarded by UPnP plugin")) {
-                                    logger.info("Port mapping attempt failed");
-                                } else {
-                                    logger.info("UDP Port Mapping successful");
-
-                                }
-                            }
-                            logger.info("TCP Port Mapping successful");
+                            logger.info("TCP port mapping successful for port " + port);
+                        }
+                        if (!gatewayDevice.addPortMapping(port, port, gatewayDevice.getLocalAddress().getHostAddress(), "UDP", "Port forwarded by UPnP plugin")) {
+                            logger.info("Port mapping attempt failed");
+                        } else {
+                            logger.info("UDP port mapping successful for port " + port);
                         }
                     }
                 }
