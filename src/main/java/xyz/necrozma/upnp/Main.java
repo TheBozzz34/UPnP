@@ -136,7 +136,6 @@ public final class Main extends JavaPlugin {
                         }
                     }
                 }
-
             } else {
                 logger.info("No valid gateway device found.");
             }
