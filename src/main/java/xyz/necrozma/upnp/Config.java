@@ -8,19 +8,17 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+import static xyz.necrozma.upnp.Main.pluginInstance;
+
 
 public class Config {
     private static Config instance;
     private final YamlDocument config;
-
-    static Logger logger = LoggerFactory.getLogger(Config.class);
 
     private Config() throws IOException {
         config = YamlDocument.create(
@@ -38,7 +36,7 @@ public class Config {
             try {
                 instance = new Config();
             } catch (IOException e) {
-                logger.error("Error while trying to load config", e);
+                pluginInstance.getLogger().severe("Error while trying to load config: " + e);
                 throw new RuntimeException(e);
             }
         }
@@ -49,7 +47,7 @@ public class Config {
         try {
             instance.config.reload();
         } catch (Exception e) {
-            logger.error("Error reloading config!");
+            pluginInstance.getLogger().severe("Error reloading config!");
             throw new RuntimeException(e);
         }
     }

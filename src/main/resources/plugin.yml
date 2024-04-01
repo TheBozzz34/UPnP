@@ -1,8 +1,0 @@
-name: UPnP
-version: '${project.version}'
-main: xyz.necrozma.upnp.Main
-api-version: 1.20
-authors: [Necrozma]
-description: A Plugin to open UPNP ports for your Minecraft server
-website: https://necrozma.xyz
-
