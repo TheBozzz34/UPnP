@@ -1,6 +1,8 @@
 # UPnP
 
-[![Build Status](https://ci.necrozma.xyz/buildStatus/icon?job=UPnP+Plugin)](https://ci.necrozma.xyz/job/UPnP%20Plugin/)
+[![Build Status](https://ci.necrozma.xyz/buildStatus/icon?job=UPnP+Plugin)](https://ci.necrozma.xyz/job/UPnP%20Plugin/) 
+
+## Version 1.8.1
 
 This plugin allows for automatic opening of user-selectable ports on supported routers. This is accomplished via the [UPnP Protocol](https://en.wikipedia.org/wiki/Universal_Plug_and_Play). The plugin will automatically open the server port, and additional ports can be added in the config for things like dynmap. You can also choose whether the plugin automatically closes the ports when the server closes.
 
