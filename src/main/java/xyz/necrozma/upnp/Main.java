@@ -1,6 +1,6 @@
 /*
     This simple plugin allows a Minecraft server to automatically open network ports on supported routers using UPnP.
-    Copyright (C) 2023  Necrozma
+    Copyright (C) 2024  Necrozma
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -37,8 +37,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,8 +52,6 @@ import org.bstats.bukkit.Metrics;
 public final class Main extends JavaPlugin {
 
     public static Main pluginInstance;
-
-    //  private static final Logger logger = LogManager.getLogger();
     public static GatewayDevice gatewayDevice;
     private Integer[] uniqueValidPortsArray = null;
     private boolean shouldRemovePortsOnStop = false;
