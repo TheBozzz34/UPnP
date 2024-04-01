@@ -44,7 +44,7 @@ import java.util.Set;
 
 import org.bstats.bukkit.Metrics;
 
-@Plugin(name="UPnP", version="1.8")
+@Plugin(name="UPnP", version="1.8.1")
 @Description("A Plugin to open UPNP ports for your Minecraft server")
 @Author("necrozma")
 @Website("necrozma.xyz")
