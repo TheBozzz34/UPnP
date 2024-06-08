@@ -93,7 +93,7 @@
         <dependency>
             <groupId>dev.dejvokep</groupId>
             <artifactId>boosted-yaml-spigot</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
         <!--BStats Metrics-->
         <dependency>
