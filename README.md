@@ -1,6 +1,6 @@
 # UPnP
 
-[![Build Status](https://ci.necrozma.xyz/buildStatus/icon?job=UPnP+Plugin)](https://ci.necrozma.xyz/job/UPnP%20Plugin/) 
+[![Java CI with Maven](https://github.com/TheBozzz34/UPnP/actions/workflows/maven.yml/badge.svg)](https://github.com/TheBozzz34/UPnP/actions/workflows/maven.yml)
 
 ## Version 1.8.1
 
