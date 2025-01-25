@@ -9,12 +9,11 @@ import org.bukkit.plugin.java.annotation.plugin.Website;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bstats.bukkit.Metrics;
-import xyz.necrozma.upnp.commands.OpenPortCommand;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Plugin(name="UPnP", version="1.9")
+@Plugin(name="UPnP", version="1.9.1")
 @Description("A Plugin to open UPNP ports for your Minecraft server")
 @Author("necrozma")
 @Website("necrozma.xyz")
@@ -51,7 +50,6 @@ public final class Main extends JavaPlugin {
             UPnPUtils.mapPorts(gatewayDevice, tcpPorts, udpPorts, this);
         }
 
-        Objects.requireNonNull(this.getCommand("openport")).setExecutor(new OpenPortCommand());
     }
 
     @Override
