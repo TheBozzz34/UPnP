@@ -36,7 +36,8 @@ This mod is licensed under the **GNU Lesser General Public License v3.0 only (LG
 
 ### License history
 
-Versions released prior to **January 3rd 2026** were licensed under **AGPL-3.0-only**. You can read more about the change [here](https://github.com/TheBozzz34/UPnP/blob/main/NOTICE.md)
-Versions released on or after **<DATE>** are licensed under **LGPL-3.0-only**.
+Versions released prior to **January 3rd 2026** were licensed under **AGPL-3.0-only**. You can read more about the change [here](https://github.com/TheBozzz34/UPnP/blob/main/NOTICE.md).
+
+Versions released on or after **January 3rd 2026** are licensed under **LGPL-3.0-only**.
 
 For the full license text, see the [LICENSE](LICENSE) file.
