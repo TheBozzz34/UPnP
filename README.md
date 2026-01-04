@@ -2,7 +2,7 @@
 
 [![Java CI with Maven](https://github.com/TheBozzz34/UPnP/actions/workflows/maven.yml/badge.svg)](https://github.com/TheBozzz34/UPnP/actions/workflows/maven.yml)
 
-[Issue Tracker](https://issues.necrozma.xyz/)
+## Open issues, bug reports, suggestions and more [here](https://issues.necrozma.xyz/).
 
 ## Version 2.0
 
