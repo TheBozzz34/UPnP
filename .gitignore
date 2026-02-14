@@ -119,3 +119,5 @@ replay_pid*
 
 # Build files
 target/
+.vscode/launch.json
+.vscode/settings.json

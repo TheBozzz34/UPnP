@@ -1,6 +1,9 @@
-config-version: 2 # Do not change this
+config-version: 3 # Do not change this
 bstats: true # Opt-out or opt-in to bStats
 close-ports-on-stop: true # Close the ports when the server stops
 ports:
   tcp: "25565" # Comma separated list of tcp ports to open
   udp: "25565" # Comma separated list of udp ports to open
+troubleshooting:
+  manual-router-ip: "" # Optional LAN IP of your router (example: 192.168.1.1). Leave empty for auto-detect.
+  verbose-logging: false # Enable extra discovery and mapping logs for troubleshooting.
